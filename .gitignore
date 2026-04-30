@@ -1,0 +1,37 @@
+# ==========================================
+# NEUROXA - .gitignore
+# Files in this list will NEVER be uploaded to GitHub
+# ==========================================
+
+# API keys & secrets - PRIVATE
+config.py
+.streamlit/secrets.toml
+.env
+*.key
+
+# Personal chat history - PRIVATE
+chat_history.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.venv/
+env/
+.Python
+
+# IDE & editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Streamlit cache
+.streamlit/cache/

@@ -1,0 +1,54 @@
+<svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Piko mascot">
+  <defs>
+    <radialGradient id="pikoBody" cx="38%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#FFB59B"/>
+      <stop offset="60%" stop-color="#FF8B6F"/>
+      <stop offset="100%" stop-color="#E86F50"/>
+    </radialGradient>
+    <radialGradient id="pikoGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FF8B6F" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#FF8B6F" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Soft glow halo -->
+  <circle cx="120" cy="125" r="115" fill="url(#pikoGlow)"/>
+
+  <!-- Floating accent dots -->
+  <circle cx="38" cy="58" r="4" fill="#FF8B6F" opacity="0.65"/>
+  <circle cx="205" cy="68" r="3" fill="#FF8B6F" opacity="0.55"/>
+  <circle cx="200" cy="180" r="5" fill="#FF8B6F" opacity="0.45"/>
+  <circle cx="50" cy="190" r="3" fill="#FF8B6F" opacity="0.55"/>
+
+  <!-- Tiny antenna with spark -->
+  <line x1="120" y1="48" x2="120" y2="32" stroke="#FF8B6F" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="120" cy="28" r="4.5" fill="#FFB59B"/>
+
+  <!-- Main blob body — organic, slightly asymmetric -->
+  <path d="M 120,50
+           C 165,50 200,78 202,118
+           C 204,158 188,195 158,208
+           C 132,219 100,219 78,206
+           C 48,190 38,150 44,112
+           C 50,75 80,50 120,50 Z"
+        fill="url(#pikoBody)"/>
+
+  <!-- Soft top highlight -->
+  <ellipse cx="98" cy="82" rx="32" ry="14" fill="white" opacity="0.28"
+           transform="rotate(-18 98 82)"/>
+
+  <!-- Eyes — oval with light highlights -->
+  <ellipse cx="98" cy="128" rx="6.5" ry="9" fill="#2A1208"/>
+  <circle cx="100" cy="125" r="2.2" fill="white"/>
+  <ellipse cx="142" cy="128" rx="6.5" ry="9" fill="#2A1208"/>
+  <circle cx="144" cy="125" r="2.2" fill="white"/>
+
+  <!-- Soft cheeks blush -->
+  <ellipse cx="78" cy="148" rx="9" ry="5" fill="#E04F2E" opacity="0.35"/>
+  <ellipse cx="162" cy="148" rx="9" ry="5" fill="#E04F2E" opacity="0.35"/>
+
+  <!-- Smile -->
+  <path d="M 108,162 Q 120,172 132,162"
+        stroke="#2A1208" stroke-width="3.5" fill="none"
+        stroke-linecap="round"/>
+</svg>
