@@ -641,7 +641,7 @@ st.markdown("""
     }
 </style>
 <button class="neuroxa-menu-btn" aria-label="Open chat history" onclick="
-    var sels=['[data-testid=stSidebarCollapsedControl]','[data-testid=collapsedControl]','[data-testid=stSidebarCollapseButton]','button[kind=header]'];
+    var sels=['[data-testid=stExpandSidebarButton]','[data-testid=stSidebarCollapseButton]','[data-testid=stSidebarCollapsedControl]','[data-testid=collapsedControl]'];
     for(var i=0;i<sels.length;i++){var el=document.querySelector(sels[i]);if(el){el.click();return;}}
 ">&#9776;</button>
 <div class="neuroxa-hint">&larr; Swipe right or tap &#9776; for chat history</div>
