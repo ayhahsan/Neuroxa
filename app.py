@@ -605,10 +605,9 @@ st.markdown("""
 <style>
     @media (min-width: 768px) {
         div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-anchor),
-        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-anchor) ~ div:has(.mobile-nav-item) {
-            display: none !important;
-        }
-        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-anchor) + div {
+        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-anchor) + div,
+        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-panel-marker),
+        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-panel-marker) + div {
             display: none !important;
         }
     }
@@ -635,6 +634,23 @@ st.markdown("""
             line-height: 1 !important;
             box-shadow: 0 2px 10px rgba(0,0,0,0.4) !important;
         }
+        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-panel-marker) {
+            display: none !important;
+        }
+        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-panel-marker) + div {
+            position: fixed !important;
+            top: 64px !important;
+            right: 10px !important;
+            width: min(280px, calc(100vw - 20px)) !important;
+            max-height: calc(100vh - 80px) !important;
+            overflow-y: auto !important;
+            z-index: 999998 !important;
+            background: var(--bg-soft) !important;
+            border: 1px solid var(--line) !important;
+            border-radius: 12px !important;
+            padding: 10px !important;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.5) !important;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -643,51 +659,50 @@ if st.button("☰", key="mobile_menu_toggle"):
     st.session_state.mobile_menu_open = not st.session_state.mobile_menu_open
 
 if st.session_state.mobile_menu_open:
-    st.markdown('<div class="mobile-nav-item"></div>', unsafe_allow_html=True)
-    if st.button("+ New chat", use_container_width=True, type="primary", key="mob_new_chat"):
-        chat_id, chat = new_chat()
-        st.session_state.all_chats[chat_id] = chat
-        st.session_state.current_chat_id = chat_id
-        save_history(st.session_state.all_chats)
-        st.rerun()
-
-    mob_sorted = sorted(
-        st.session_state.all_chats.values(),
-        key=lambda c: c.get("created_at", ""),
-        reverse=True
-    )
-    for chat in mob_sorted:
-        is_current = chat["id"] == st.session_state.current_chat_id
-        title = chat.get("title", "New chat")
-        prefix = "› " if is_current else "  "
-        st.markdown('<div class="mobile-nav-item"></div>', unsafe_allow_html=True)
-        if st.button(
-            prefix + title,
-            key=f"mob_chat_{chat['id']}",
-            use_container_width=True
-        ):
-            st.session_state.current_chat_id = chat["id"]
-            st.rerun()
-
-    st.markdown('<div class="mobile-nav-item"></div>', unsafe_allow_html=True)
-    if st.button("Delete this chat", use_container_width=True, key="mob_delete_chat"):
-        cid = st.session_state.current_chat_id
-        if cid in st.session_state.all_chats:
-            del st.session_state.all_chats[cid]
+    st.markdown('<div id="mobile-nav-panel-marker"></div>', unsafe_allow_html=True)
+    with st.container():
+        if st.button("+ New chat", use_container_width=True, type="primary", key="mob_new_chat"):
+            chat_id, chat = new_chat()
+            st.session_state.all_chats[chat_id] = chat
+            st.session_state.current_chat_id = chat_id
             save_history(st.session_state.all_chats)
-            if st.session_state.all_chats:
-                remaining = sorted(
-                    st.session_state.all_chats.values(),
-                    key=lambda c: c.get("created_at", ""),
-                    reverse=True
-                )
-                st.session_state.current_chat_id = remaining[0]["id"]
-            else:
-                chat_id, chat = new_chat()
-                st.session_state.all_chats[chat_id] = chat
-                st.session_state.current_chat_id = chat_id
-                save_history(st.session_state.all_chats)
             st.rerun()
+
+        mob_sorted = sorted(
+            st.session_state.all_chats.values(),
+            key=lambda c: c.get("created_at", ""),
+            reverse=True
+        )
+        for chat in mob_sorted:
+            is_current = chat["id"] == st.session_state.current_chat_id
+            title = chat.get("title", "New chat")
+            prefix = "› " if is_current else "  "
+            if st.button(
+                prefix + title,
+                key=f"mob_chat_{chat['id']}",
+                use_container_width=True
+            ):
+                st.session_state.current_chat_id = chat["id"]
+                st.rerun()
+
+        if st.button("Delete this chat", use_container_width=True, key="mob_delete_chat"):
+            cid = st.session_state.current_chat_id
+            if cid in st.session_state.all_chats:
+                del st.session_state.all_chats[cid]
+                save_history(st.session_state.all_chats)
+                if st.session_state.all_chats:
+                    remaining = sorted(
+                        st.session_state.all_chats.values(),
+                        key=lambda c: c.get("created_at", ""),
+                        reverse=True
+                    )
+                    st.session_state.current_chat_id = remaining[0]["id"]
+                else:
+                    chat_id, chat = new_chat()
+                    st.session_state.all_chats[chat_id] = chat
+                    st.session_state.current_chat_id = chat_id
+                    save_history(st.session_state.all_chats)
+                st.rerun()
 
 current_chat = st.session_state.all_chats[st.session_state.current_chat_id]
 messages = current_chat["messages"]
