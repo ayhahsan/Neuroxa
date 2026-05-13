@@ -596,18 +596,30 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# ============ MOBILE CHAT NAV (expander, hidden on desktop) ============
+# ============ MOBILE CHAT NAV (custom toggle, hidden on desktop) ============
+if "mobile_menu_open" not in st.session_state:
+    st.session_state.mobile_menu_open = False
+
 st.markdown("""
+<div id="mobile-nav-anchor"></div>
 <style>
     @media (min-width: 768px) {
-        [data-testid="stExpander"] {
+        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-anchor),
+        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-anchor) ~ div:has(.mobile-nav-item) {
+            display: none !important;
+        }
+        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-anchor) + div {
             display: none !important;
         }
     }
 </style>
 """, unsafe_allow_html=True)
 
-with st.expander("Chat History", expanded=False):
+if st.button("☰  Chat History", key="mobile_menu_toggle", use_container_width=True):
+    st.session_state.mobile_menu_open = not st.session_state.mobile_menu_open
+
+if st.session_state.mobile_menu_open:
+    st.markdown('<div class="mobile-nav-item"></div>', unsafe_allow_html=True)
     if st.button("+ New chat", use_container_width=True, type="primary", key="mob_new_chat"):
         chat_id, chat = new_chat()
         st.session_state.all_chats[chat_id] = chat
@@ -624,6 +636,7 @@ with st.expander("Chat History", expanded=False):
         is_current = chat["id"] == st.session_state.current_chat_id
         title = chat.get("title", "New chat")
         prefix = "› " if is_current else "  "
+        st.markdown('<div class="mobile-nav-item"></div>', unsafe_allow_html=True)
         if st.button(
             prefix + title,
             key=f"mob_chat_{chat['id']}",
@@ -632,6 +645,7 @@ with st.expander("Chat History", expanded=False):
             st.session_state.current_chat_id = chat["id"]
             st.rerun()
 
+    st.markdown('<div class="mobile-nav-item"></div>', unsafe_allow_html=True)
     if st.button("Delete this chat", use_container_width=True, key="mob_delete_chat"):
         cid = st.session_state.current_chat_id
         if cid in st.session_state.all_chats:
