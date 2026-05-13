@@ -598,25 +598,11 @@ st.markdown(
 
 # ============ MOBILE CHAT NAV (expander, hidden on desktop) ============
 st.markdown("""
-<div id="neuroxa-mobile-nav-anchor"></div>
 <style>
-    @media (min-width: 769px) {
-        div[data-testid="stVerticalBlock"] > div:has(#neuroxa-mobile-nav-anchor),
-        div[data-testid="stVerticalBlock"] > div:has(#neuroxa-mobile-nav-anchor) + div {
+    @media (min-width: 768px) {
+        [data-testid="stExpander"] {
             display: none !important;
         }
-    }
-    [data-testid="stExpander"] details {
-        background: var(--bg-soft) !important;
-        border: 1px solid var(--line) !important;
-        border-radius: 10px !important;
-    }
-    [data-testid="stExpander"] summary {
-        font-family: 'Geist Mono', monospace !important;
-        font-size: 11px !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.18em !important;
-        color: var(--ink-dim) !important;
     }
 </style>
 """, unsafe_allow_html=True)
