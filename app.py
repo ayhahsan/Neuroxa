@@ -596,6 +596,57 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# ============ MOBILE MENU BUTTON & HINT ============
+st.markdown("""
+<style>
+    .neuroxa-menu-btn { display: none; }
+    .neuroxa-hint { display: none; }
+    @media (max-width: 768px) {
+        .neuroxa-menu-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 999999;
+            width: 44px;
+            height: 44px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            color: var(--ink);
+            font-size: 22px;
+            line-height: 1;
+            cursor: pointer;
+            font-family: 'Geist', sans-serif;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            padding: 0;
+        }
+        .neuroxa-menu-btn:active {
+            background: var(--bg-bubble);
+            border-color: var(--ink-dim);
+        }
+        .neuroxa-hint {
+            display: block;
+            text-align: center;
+            color: var(--ink-dim);
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            font-size: 12px;
+            margin: -0.75rem 0 1rem 0;
+            padding: 0 1rem;
+        }
+        .main .block-container { padding-top: 4rem !important; }
+    }
+</style>
+<button class="neuroxa-menu-btn" aria-label="Open chat history" onclick="
+    var sels=['[data-testid=stSidebarCollapsedControl]','[data-testid=collapsedControl]','[data-testid=stSidebarCollapseButton]','button[kind=header]'];
+    for(var i=0;i<sels.length;i++){var el=document.querySelector(sels[i]);if(el){el.click();return;}}
+">&#9776;</button>
+<div class="neuroxa-hint">&larr; Swipe right or tap &#9776; for chat history</div>
+""", unsafe_allow_html=True)
+
 current_chat = st.session_state.all_chats[st.session_state.current_chat_id]
 messages = current_chat["messages"]
 
