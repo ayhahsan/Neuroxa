@@ -612,10 +612,34 @@ st.markdown("""
             display: none !important;
         }
     }
+    @media (max-width: 767px) {
+        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-anchor) + div {
+            position: fixed !important;
+            top: 10px;
+            right: 10px;
+            z-index: 999999;
+            width: auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-anchor) + div .stButton > button {
+            width: 44px !important;
+            height: 44px !important;
+            min-width: 44px !important;
+            padding: 0 !important;
+            background: var(--bg-elevated) !important;
+            border: 1px solid var(--line) !important;
+            border-radius: 10px !important;
+            color: var(--ink) !important;
+            font-size: 22px !important;
+            line-height: 1 !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.4) !important;
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
-if st.button("☰  Chat History", key="mobile_menu_toggle", use_container_width=True):
+if st.button("☰", key="mobile_menu_toggle"):
     st.session_state.mobile_menu_open = not st.session_state.mobile_menu_open
 
 if st.session_state.mobile_menu_open:
