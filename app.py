@@ -596,56 +596,74 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# ============ MOBILE MENU BUTTON & HINT ============
+# ============ MOBILE CHAT NAV (expander, hidden on desktop) ============
 st.markdown("""
+<div id="neuroxa-mobile-nav-anchor"></div>
 <style>
-    .neuroxa-menu-btn { display: none; }
-    .neuroxa-hint { display: none; }
-    @media (max-width: 768px) {
-        .neuroxa-menu-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            z-index: 999999;
-            width: 44px;
-            height: 44px;
-            background: var(--bg-elevated);
-            border: 1px solid var(--line);
-            border-radius: 10px;
-            color: var(--ink);
-            font-size: 22px;
-            line-height: 1;
-            cursor: pointer;
-            font-family: 'Geist', sans-serif;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            padding: 0;
+    @media (min-width: 769px) {
+        div[data-testid="stVerticalBlock"] > div:has(#neuroxa-mobile-nav-anchor),
+        div[data-testid="stVerticalBlock"] > div:has(#neuroxa-mobile-nav-anchor) + div {
+            display: none !important;
         }
-        .neuroxa-menu-btn:active {
-            background: var(--bg-bubble);
-            border-color: var(--ink-dim);
-        }
-        .neuroxa-hint {
-            display: block;
-            text-align: center;
-            color: var(--ink-dim);
-            font-family: 'Instrument Serif', serif;
-            font-style: italic;
-            font-size: 12px;
-            margin: -0.75rem 0 1rem 0;
-            padding: 0 1rem;
-        }
-        .main .block-container { padding-top: 4rem !important; }
+    }
+    [data-testid="stExpander"] details {
+        background: var(--bg-soft) !important;
+        border: 1px solid var(--line) !important;
+        border-radius: 10px !important;
+    }
+    [data-testid="stExpander"] summary {
+        font-family: 'Geist Mono', monospace !important;
+        font-size: 11px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.18em !important;
+        color: var(--ink-dim) !important;
     }
 </style>
-<button class="neuroxa-menu-btn" aria-label="Open chat history" onclick="
-    var sels=['[data-testid=stExpandSidebarButton]','[data-testid=stSidebarCollapseButton]','[data-testid=stSidebarCollapsedControl]','[data-testid=collapsedControl]'];
-    for(var i=0;i<sels.length;i++){var el=document.querySelector(sels[i]);if(el){el.click();return;}}
-">&#9776;</button>
-<div class="neuroxa-hint">&larr; Swipe right or tap &#9776; for chat history</div>
 """, unsafe_allow_html=True)
+
+with st.expander("Chat History", expanded=False):
+    if st.button("+ New chat", use_container_width=True, type="primary", key="mob_new_chat"):
+        chat_id, chat = new_chat()
+        st.session_state.all_chats[chat_id] = chat
+        st.session_state.current_chat_id = chat_id
+        save_history(st.session_state.all_chats)
+        st.rerun()
+
+    mob_sorted = sorted(
+        st.session_state.all_chats.values(),
+        key=lambda c: c.get("created_at", ""),
+        reverse=True
+    )
+    for chat in mob_sorted:
+        is_current = chat["id"] == st.session_state.current_chat_id
+        title = chat.get("title", "New chat")
+        prefix = "› " if is_current else "  "
+        if st.button(
+            prefix + title,
+            key=f"mob_chat_{chat['id']}",
+            use_container_width=True
+        ):
+            st.session_state.current_chat_id = chat["id"]
+            st.rerun()
+
+    if st.button("Delete this chat", use_container_width=True, key="mob_delete_chat"):
+        cid = st.session_state.current_chat_id
+        if cid in st.session_state.all_chats:
+            del st.session_state.all_chats[cid]
+            save_history(st.session_state.all_chats)
+            if st.session_state.all_chats:
+                remaining = sorted(
+                    st.session_state.all_chats.values(),
+                    key=lambda c: c.get("created_at", ""),
+                    reverse=True
+                )
+                st.session_state.current_chat_id = remaining[0]["id"]
+            else:
+                chat_id, chat = new_chat()
+                st.session_state.all_chats[chat_id] = chat
+                st.session_state.current_chat_id = chat_id
+                save_history(st.session_state.all_chats)
+            st.rerun()
 
 current_chat = st.session_state.all_chats[st.session_state.current_chat_id]
 messages = current_chat["messages"]
