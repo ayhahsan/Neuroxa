@@ -390,7 +390,7 @@ st.markdown("""
             background: transparent !important;
             height: auto !important;
         }
-        [data-testid="stSidebarCollapsedControl"] {
+        [data-testid="stExpandSidebarButton"] {
             display: flex !important;
             visibility: visible !important;
             opacity: 1 !important;
