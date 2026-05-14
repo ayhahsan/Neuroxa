@@ -384,6 +384,12 @@ st.markdown("""
     }
 
     @media (max-width: 767px) {
+        header[data-testid="stHeader"] {
+            display: block !important;
+            visibility: visible !important;
+            background: transparent !important;
+            height: auto !important;
+        }
         [data-testid="stSidebarCollapsedControl"] {
             display: flex !important;
             visibility: visible !important;
