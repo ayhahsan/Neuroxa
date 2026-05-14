@@ -19,7 +19,7 @@ st.set_page_config(
     page_title="Neuroxa",
     page_icon="https://api.iconify.design/lucide:sparkles.svg",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # ============ STORAGE ============
@@ -75,13 +75,17 @@ st.markdown("""
         color: var(--ink) !important;
     }
 
-    /* Hide Streamlit chrome */
-    #MainMenu, footer, header[data-testid="stHeader"],
+    /* Hide Streamlit chrome (but keep stHeader so the sidebar expand button is reachable) */
+    #MainMenu, footer,
     [data-testid="stToolbar"], [data-testid="stDecoration"],
-    [data-testid="stStatusWidget"], .stDeployButton, .stAppDeployButton,
-    [data-testid="stSidebarHeader"] {
+    [data-testid="stStatusWidget"], .stDeployButton, .stAppDeployButton {
         display: none !important;
         visibility: hidden !important;
+    }
+
+    /* Keep the top header transparent so only the sidebar toggle button shows */
+    header[data-testid="stHeader"] {
+        background: transparent !important;
     }
 
     .main .block-container {
@@ -381,20 +385,6 @@ st.markdown("""
     hr {
         border-color: var(--line) !important;
         margin: 1rem 0 !important;
-    }
-
-    @media (max-width: 767px) {
-        header[data-testid="stHeader"] {
-            display: block !important;
-            visibility: visible !important;
-            background: transparent !important;
-            height: auto !important;
-        }
-        [data-testid="stExpandSidebarButton"] {
-            display: flex !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
     }
 </style>
 """, unsafe_allow_html=True)
