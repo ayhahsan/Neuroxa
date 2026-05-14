@@ -604,15 +604,18 @@ st.markdown("""
 <div id="mobile-nav-anchor"></div>
 <style>
     @media (min-width: 768px) {
-        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-anchor),
-        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-anchor) + div,
-        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-panel-marker),
-        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-panel-marker) + div {
+        .main div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-anchor),
+        .main div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-anchor) + div,
+        .main div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-panel-marker),
+        .main div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-panel-marker) + div {
             display: none !important;
         }
     }
     @media (max-width: 767px) {
-        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-anchor) + div {
+        section[data-testid="stSidebar"] {
+            display: none !important;
+        }
+        .main div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-anchor) + div {
             position: fixed !important;
             top: 10px;
             right: 10px;
@@ -621,7 +624,7 @@ st.markdown("""
             margin: 0 !important;
             padding: 0 !important;
         }
-        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-anchor) + div .stButton > button {
+        .main div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-anchor) + div .stButton > button {
             width: 44px !important;
             height: 44px !important;
             min-width: 44px !important;
@@ -634,10 +637,10 @@ st.markdown("""
             line-height: 1 !important;
             box-shadow: 0 2px 10px rgba(0,0,0,0.4) !important;
         }
-        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-panel-marker) {
+        .main div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-panel-marker) {
             display: none !important;
         }
-        div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-panel-marker) + div {
+        .main div[data-testid="stVerticalBlock"] > div:has(#mobile-nav-panel-marker) + div {
             position: fixed !important;
             top: 64px !important;
             right: 10px !important;
