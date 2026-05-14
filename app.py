@@ -384,13 +384,10 @@ st.markdown("""
     }
 
     @media (max-width: 767px) {
-        section[data-testid="stSidebar"] {
-            transform: translateX(0) !important;
-            display: block !important;
-            position: fixed !important;
-            z-index: 999 !important;
-            width: 80vw !important;
-            height: 100vh !important;
+        [data-testid="stSidebarCollapsedControl"] {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
     }
 </style>
@@ -644,6 +641,10 @@ if not messages:
     st.markdown(
         '<div class="empty-state">'
         '<div class="empty-state-title">How can I <em>help</em> you today?</div>'
+        '<p class="empty-state-desc">'
+        'Coding question hai toh Mano sambhalega, general baat hai toh Piko. '
+        'Auto-routing on hai.'
+        '</p>'
         '</div>',
         unsafe_allow_html=True
     )
