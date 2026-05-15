@@ -817,11 +817,8 @@ with st.sidebar:
 
 
 # ============ CUSTOM SIDEBAR TOGGLE (injected via parent-page JS) ============
-# Streamlit's native expand button gets hidden in some versions / states.
-# We inject our own floating button into the parent page that:
-#   1. Is always visible at top-left
-#   2. Toggles sidebar by directly manipulating the sidebar element OR
-#      clicking Streamlit's native toggle if found
+# Bypass Streamlit's hidden toggle entirely. We directly manipulate the
+# sidebar element's CSS via setProperty(name, value, 'important').
 components.html(
     """
     <script>
@@ -852,6 +849,7 @@ components.html(
                 line-height: 1;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.3);
                 transition: all 0.15s ease;
+                min-width: 40px;
             `;
 
             btn.onmouseover = () => {
@@ -863,34 +861,42 @@ components.html(
                 btn.style.borderColor = '#2A2D38';
             };
 
-            btn.onclick = () => {
-                // Try multiple selectors to find Streamlit's native toggle
-                const candidates = [
-                    '[data-testid="collapsedControl"]',
-                    '[data-testid="stSidebarCollapsedControl"]',
-                    '[data-testid="stSidebarCollapseButton"]',
-                    '[data-testid="stSidebarHeader"] button',
-                    'button[kind="header"]',
-                    'button[kind="headerNoPadding"]',
-                ];
+            btn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
 
-                for (const sel of candidates) {
-                    const el = parentDoc.querySelector(sel);
-                    if (el && el.offsetParent !== null || (el && el.click)) {
-                        el.click();
-                        return;
-                    }
+                const sidebar = parentDoc.querySelector('section[data-testid="stSidebar"]');
+                if (!sidebar) {
+                    console.log('[Neuroxa] Sidebar element not found in DOM');
+                    return;
                 }
 
-                // Fallback: directly toggle sidebar element visibility
-                const sidebar = parentDoc.querySelector('section[data-testid="stSidebar"]');
-                if (sidebar) {
-                    const isHidden = sidebar.offsetWidth < 50;
-                    if (isHidden) {
-                        sidebar.style.cssText += 'width: 280px !important; min-width: 280px !important; transform: none !important; display: flex !important; visibility: visible !important;';
-                    } else {
-                        sidebar.style.cssText += 'width: 0 !important; min-width: 0 !important; transform: translateX(-100%) !important;';
-                    }
+                // Determine current state by measuring actual width
+                const rect = sidebar.getBoundingClientRect();
+                const isCurrentlyHidden = rect.width < 50 || rect.left < -50;
+
+                if (isCurrentlyHidden) {
+                    // SHOW sidebar — force via inline !important
+                    sidebar.style.setProperty('transform', 'none', 'important');
+                    sidebar.style.setProperty('width', '280px', 'important');
+                    sidebar.style.setProperty('min-width', '280px', 'important');
+                    sidebar.style.setProperty('max-width', '280px', 'important');
+                    sidebar.style.setProperty('margin-left', '0', 'important');
+                    sidebar.style.setProperty('display', 'flex', 'important');
+                    sidebar.style.setProperty('visibility', 'visible', 'important');
+                    sidebar.style.setProperty('opacity', '1', 'important');
+                    sidebar.style.setProperty('left', '0', 'important');
+                    sidebar.style.setProperty('position', 'relative', 'important');
+                    btn.innerHTML = '✕';
+                } else {
+                    // HIDE sidebar
+                    sidebar.style.setProperty('transform', 'translateX(-100%)', 'important');
+                    sidebar.style.setProperty('width', '0', 'important');
+                    sidebar.style.setProperty('min-width', '0', 'important');
+                    sidebar.style.setProperty('max-width', '0', 'important');
+                    sidebar.style.setProperty('margin-left', '-280px', 'important');
+                    sidebar.style.setProperty('opacity', '0', 'important');
+                    btn.innerHTML = '☰';
                 }
             };
 
@@ -900,8 +906,12 @@ components.html(
         // Initial setup
         setupToggle();
 
-        // Re-run setup whenever DOM changes (Streamlit reruns the script)
-        const observer = new MutationObserver(setupToggle);
+        // Re-inject button if Streamlit removes it during reruns
+        const observer = new MutationObserver(() => {
+            if (!parentDoc.getElementById('neuroxa-sidebar-toggle')) {
+                setupToggle();
+            }
+        });
         observer.observe(parentDoc.body, { childList: true, subtree: false });
     })();
     </script>
