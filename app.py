@@ -57,24 +57,28 @@ st.markdown(
     """
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,400;9..144,500&display=swap" rel="stylesheet">
 
 <style>
     :root {
-        --bg: #0B0B0D;
-        --surface: #141417;
-        --surface-2: #1C1C20;
-        --surface-3: #25252A;
-        --border: #2A2A30;
-        --border-strong: #3A3A42;
-        --text: #ECECEE;
-        --text-dim: #9A9AA2;
-        --text-mute: #5C5C66;
-        --piko: #FF8B6F;
-        --mano: #DAFF3D;
+        /* Slate-tinted dark, warmer than pure black */
+        --bg: #0F1014;
+        --bg-2: #14161C;
+        --surface: #181A21;
+        --surface-2: #1F222B;
+        --surface-3: #272A35;
+        --border: #2A2D38;
+        --border-strong: #3A3E4B;
+        --text: #F2F3F5;
+        --text-dim: #9CA0AC;
+        --text-mute: #5C6070;
+        --piko: #FF9B7A;
+        --piko-soft: rgba(255, 155, 122, 0.08);
+        --mano: #D4F542;
+        --mano-soft: rgba(212, 245, 66, 0.08);
+        --accent: #8B7CF6;
     }
 
-    /* ==== Base ==== */
     html, body, .stApp, [data-testid="stAppViewContainer"],
     [data-testid="stMain"], .main {
         background: var(--bg) !important;
@@ -82,93 +86,90 @@ st.markdown(
     }
 
     .stApp, .stApp p, .stApp span, .stApp div, .stApp label {
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
         color: var(--text);
     }
 
-    /* ==== Hide Streamlit chrome (but KEEP the sidebar toggle visible) ==== */
+    /* ===== Hide ONLY what we don't need — leave sidebar controls alone ===== */
     #MainMenu,
     footer,
     header[data-testid="stHeader"],
     [data-testid="stToolbar"],
     [data-testid="stDecoration"],
     [data-testid="stStatusWidget"],
-    [data-testid="stMainMenu"],
     [data-testid="stDeployButton"],
     .stDeployButton,
-    .stAppDeployButton,
-    .viewerBadge_container__1QSob,
-    .viewerBadge_link__1S137 {
+    .stAppDeployButton {
         display: none !important;
     }
 
-    /* IMPORTANT: explicitly keep the sidebar collapse/expand arrow visible */
-    [data-testid="collapsedControl"] {
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
+    /* Main container */
+    .main .block-container {
+        padding-top: 1.25rem !important;
+        padding-bottom: 8rem !important;
+        max-width: 860px !important;
+    }
+
+    /* ===== Sidebar — minimal CSS so native toggle works ===== */
+    section[data-testid="stSidebar"] {
+        background: var(--bg-2) !important;
+        border-right: 1px solid var(--border) !important;
+        width: 280px !important;
+    }
+
+    /* Native sidebar toggle / close button — make visible and styled */
+    [data-testid="stSidebarCollapseButton"],
+    [data-testid="collapsedControl"],
+    button[kind="headerNoPadding"] {
         background: var(--surface) !important;
         border: 1px solid var(--border) !important;
         border-radius: 8px !important;
         color: var(--text) !important;
-        top: 0.75rem !important;
-        left: 0.75rem !important;
-        z-index: 999 !important;
+        opacity: 1 !important;
+        visibility: visible !important;
     }
 
+    [data-testid="stSidebarCollapseButton"]:hover,
     [data-testid="collapsedControl"]:hover {
         background: var(--surface-2) !important;
         border-color: var(--border-strong) !important;
     }
 
+    [data-testid="stSidebarCollapseButton"] svg,
     [data-testid="collapsedControl"] svg {
         color: var(--text) !important;
         fill: var(--text) !important;
     }
 
-    /* ==== Main container ==== */
-    .main .block-container {
-        padding-top: 2rem !important;
-        padding-bottom: 8rem !important;
-        max-width: 820px !important;
-    }
-
-    /* ==== Sidebar ==== */
-    section[data-testid="stSidebar"] {
-        background: var(--surface) !important;
-        border-right: 1px solid var(--border) !important;
-        width: 280px !important;
-    }
-
-    section[data-testid="stSidebar"] > div {
-        padding-top: 1.25rem !important;
-    }
-
+    /* Sidebar brand */
     .brand {
-        font-family: 'Instrument Serif', serif;
-        font-size: 30px;
+        font-family: 'Fraunces', serif;
+        font-size: 26px;
         line-height: 1;
         color: var(--text);
-        letter-spacing: -0.03em;
-        padding: 0 0.25rem 0.25rem;
-        margin-bottom: 1.25rem;
+        letter-spacing: -0.02em;
+        font-weight: 500;
+        padding: 0.5rem 0.25rem 0;
+        margin-bottom: 1.5rem;
+        display: inline-block;
     }
 
     .brand .x {
-        background: linear-gradient(135deg, var(--piko) 0%, var(--mano) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        font-style: italic;
+        color: var(--mano);
+        font-weight: 500;
+        font-style: normal;
+        display: inline-block;
+        padding: 0 1px;
     }
 
     .section-label {
         font-family: 'JetBrains Mono', monospace;
         font-size: 10px;
         text-transform: uppercase;
-        letter-spacing: 0.16em;
+        letter-spacing: 0.18em;
         color: var(--text-mute);
         margin: 1.5rem 0.25rem 0.5rem;
+        font-weight: 500;
     }
 
     /* All sidebar buttons */
@@ -177,22 +178,19 @@ st.markdown(
         color: var(--text-dim) !important;
         border: 1px solid transparent !important;
         border-radius: 8px !important;
-        font-family: 'Inter', sans-serif !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
         font-size: 13px !important;
         font-weight: 400 !important;
         padding: 8px 12px !important;
         text-align: left !important;
         white-space: normal !important;
         line-height: 1.4 !important;
-        letter-spacing: 0 !important;
-        text-transform: none !important;
         transition: all 0.15s ease !important;
-        height: auto !important;
         min-height: 36px !important;
     }
 
     section[data-testid="stSidebar"] .stButton > button:hover {
-        background: var(--surface-2) !important;
+        background: var(--surface) !important;
         color: var(--text) !important;
         border-color: var(--border) !important;
     }
@@ -202,24 +200,23 @@ st.markdown(
         outline: none !important;
     }
 
-    /* Primary button (New chat) */
+    /* Primary button — New chat */
     section[data-testid="stSidebar"] .stButton > button[kind="primary"] {
-        background: var(--text) !important;
-        color: var(--bg) !important;
-        border: 1px solid var(--text) !important;
-        font-weight: 500 !important;
+        background: linear-gradient(135deg, var(--piko) 0%, var(--mano) 100%) !important;
+        color: #0F1014 !important;
+        border: 1px solid transparent !important;
+        font-weight: 600 !important;
         text-align: center !important;
     }
 
     section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
-        background: var(--piko) !important;
-        border-color: var(--piko) !important;
-        color: var(--bg) !important;
+        opacity: 0.92 !important;
+        filter: brightness(1.05) !important;
     }
 
     section[data-testid="stSidebar"] .stButton > button[kind="primary"] p,
     section[data-testid="stSidebar"] .stButton > button[kind="primary"] div {
-        color: var(--bg) !important;
+        color: #0F1014 !important;
     }
 
     section[data-testid="stSidebar"] hr {
@@ -227,59 +224,173 @@ st.markdown(
         margin: 1rem 0 !important;
     }
 
-    /* ==== Page header ==== */
-    .page-header {
-        text-align: center;
-        padding: 0.5rem 0 1.5rem;
-        margin-bottom: 1rem;
+    /* ===== Top bar inside main area ===== */
+    .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 0 1.25rem 0;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 2rem;
     }
 
-    .page-header h1 {
-        font-family: 'Instrument Serif', serif !important;
-        font-size: 2.75rem !important;
-        font-weight: 400 !important;
-        letter-spacing: -0.04em !important;
-        color: var(--text) !important;
-        line-height: 1 !important;
-        margin: 0 !important;
+    .topbar-brand {
+        font-family: 'Fraunces', serif;
+        font-size: 22px;
+        font-weight: 500;
+        color: var(--text);
+        letter-spacing: -0.01em;
+        line-height: 1;
     }
 
-    .page-header h1 .x {
-        background: linear-gradient(135deg, var(--piko) 0%, var(--mano) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        font-style: italic;
+    .topbar-brand .x {
+        color: var(--mano);
+        font-style: normal;
+        display: inline-block;
+        padding: 0 1px;
     }
 
-    .page-header .tagline {
-        font-family: 'Instrument Serif', serif !important;
-        font-style: italic !important;
-        color: var(--text-dim) !important;
-        font-size: 1rem !important;
-        margin-top: 0.35rem !important;
+    .topbar-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--text-mute);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
     }
 
-    /* ==== Empty state ==== */
-    .empty {
-        text-align: center;
-        padding: 4rem 1rem 2rem;
+    .topbar-status .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #4ADE80;
+        box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
     }
 
-    .empty .title {
-        font-family: 'Instrument Serif', serif !important;
-        font-size: 2.25rem !important;
-        color: var(--text) !important;
-        letter-spacing: -0.02em !important;
-        line-height: 1.15 !important;
+    /* ===== Empty state — model cards ===== */
+    .welcome {
+        padding: 2rem 0 0;
     }
 
-    .empty .title em {
-        color: var(--text-dim) !important;
-        font-style: italic !important;
+    .welcome-title {
+        font-family: 'Fraunces', serif;
+        font-size: 2.5rem;
+        font-weight: 400;
+        color: var(--text);
+        letter-spacing: -0.025em;
+        line-height: 1.1;
+        margin-bottom: 0.4rem;
     }
 
-    /* ==== Chat: user bubble ==== */
+    .welcome-subtitle {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 0.95rem;
+        color: var(--text-dim);
+        margin-bottom: 2rem;
+    }
+
+    .model-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 1.75rem;
+    }
+
+    .model-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px 20px;
+        transition: all 0.2s ease;
+    }
+
+    .model-card.piko {
+        border-color: rgba(255, 155, 122, 0.15);
+        background: linear-gradient(180deg, var(--piko-soft) 0%, var(--surface) 100%);
+    }
+
+    .model-card.mano {
+        border-color: rgba(212, 245, 66, 0.15);
+        background: linear-gradient(180deg, var(--mano-soft) 0%, var(--surface) 100%);
+    }
+
+    .model-card-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .model-card-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .model-card-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .model-card-name {
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--text);
+    }
+
+    .model-card-tag {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 2px 7px;
+        border-radius: 4px;
+        margin-left: auto;
+    }
+
+    .model-card.piko .model-card-tag {
+        color: var(--piko);
+        background: rgba(255, 155, 122, 0.1);
+    }
+
+    .model-card.mano .model-card-tag {
+        color: var(--mano);
+        background: rgba(212, 245, 66, 0.1);
+    }
+
+    .model-card-desc {
+        font-size: 13px;
+        color: var(--text-dim);
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    .router-hint {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 14px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 13px;
+        color: var(--text-dim);
+    }
+
+    .router-hint-icon {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        color: var(--accent);
+    }
+
+    /* ===== Chat: user bubble ===== */
     .user-row {
         display: flex;
         justify-content: flex-end;
@@ -287,11 +398,11 @@ st.markdown(
     }
 
     .user-bubble {
-        max-width: 75%;
+        max-width: 78%;
         padding: 11px 16px;
         background: var(--surface-2);
         border: 1px solid var(--border);
-        border-radius: 18px;
+        border-radius: 16px;
         border-top-right-radius: 4px;
         font-size: 15px;
         line-height: 1.55;
@@ -300,7 +411,7 @@ st.markdown(
         white-space: pre-wrap;
     }
 
-    /* ==== Chat: assistant ==== */
+    /* ===== Chat: assistant ===== */
     .assistant-avatar {
         width: 30px;
         height: 30px;
@@ -327,10 +438,7 @@ st.markdown(
     .assistant-content p {
         margin: 0 0 0.7rem 0 !important;
     }
-
-    .assistant-content p:last-child {
-        margin-bottom: 0 !important;
-    }
+    .assistant-content p:last-child { margin-bottom: 0 !important; }
 
     .assistant-content code {
         background: var(--surface-2) !important;
@@ -360,23 +468,34 @@ st.markdown(
         line-height: 1.6 !important;
     }
 
-    .assistant-content strong {
-        color: var(--text);
-        font-weight: 600;
+    .assistant-content strong { color: var(--text); font-weight: 600; }
+    .assistant-content a { color: var(--piko); text-decoration: none; border-bottom: 1px solid transparent; }
+    .assistant-content a:hover { border-bottom-color: var(--piko); }
+
+    /* ===== Typing dots loading ===== */
+    .typing-dots {
+        display: inline-flex;
+        gap: 4px;
+        padding: 8px 0;
     }
 
-    .assistant-content a {
-        color: var(--piko);
-        text-decoration: none;
-        border-bottom: 1px solid transparent;
-        transition: border-color 0.15s;
+    .typing-dots span {
+        width: 7px;
+        height: 7px;
+        background: var(--text-dim);
+        border-radius: 50%;
+        animation: typing-bounce 1.4s infinite ease-in-out both;
     }
 
-    .assistant-content a:hover {
-        border-bottom-color: var(--piko);
+    .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes typing-bounce {
+        0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+        40% { transform: scale(1); opacity: 1; }
     }
 
-    /* ==== Chat input ==== */
+    /* ===== Chat input ===== */
     [data-testid="stChatInput"] {
         background: var(--surface) !important;
         border: 1px solid var(--border) !important;
@@ -391,7 +510,7 @@ st.markdown(
     [data-testid="stChatInput"] textarea {
         background: transparent !important;
         color: var(--text) !important;
-        font-family: 'Inter', sans-serif !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
         font-size: 15px !important;
         line-height: 1.5 !important;
     }
@@ -412,7 +531,7 @@ st.markdown(
     }
 
     [data-testid="stChatInput"] button:hover {
-        background: var(--piko) !important;
+        background: var(--mano) !important;
     }
 
     [data-testid="stChatInput"] button svg {
@@ -420,20 +539,17 @@ st.markdown(
         fill: var(--bg) !important;
     }
 
-    /* Hide default chat message containers (we render our own) */
+    /* Hide default chat message containers */
     [data-testid="stChatMessage"] {
         background: transparent !important;
         padding: 0 !important;
         gap: 0 !important;
     }
 
-    /* ==== Scrollbar ==== */
+    /* Scrollbar */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb {
-        background: var(--border);
-        border-radius: 4px;
-    }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
 </style>
 """,
@@ -464,8 +580,7 @@ MODELS = {
             "You are Mano, one of two models that power Neuroxa. "
             "You are a senior software engineer focused on clean, production-ready code. "
             "Do not use emojis. "
-            "MANDATORY: always wrap code in markdown fenced blocks with the correct language tag "
-            "(python, javascript, html, css, sql, bash, etc.). "
+            "MANDATORY: always wrap code in markdown fenced blocks with the correct language tag. "
             "Structure: brief intro, code block, short explanation. "
             "Use `inline code` for variable and function names. "
             "Match the user's natural language in prose; keep code itself in English. "
@@ -481,13 +596,11 @@ CODE_KEYWORDS = [
     "react", "vue", "angular", "node", "api", "endpoint", "rest", "graphql",
     "sql", "database", "query", "algorithm", "syntax", "variable", "loop",
     "array", "list", "dict", "class", "method", "framework", "library", "package",
-    "git", "github", "gitlab", "deploy", "server", "regex", "json", "xml", "yaml",
+    "git", "github", "deploy", "server", "regex", "json", "xml", "yaml",
     "frontend", "backend", "fullstack", "devops", "docker", "kubernetes", "aws",
-    "azure", "gcp", "import", "module", "npm", "pip", "install", "terminal",
-    "command", "shell", "bash", "zsh", "runtime", "memory", "thread", "async",
-    "await", "promise", "recursion", "fibonacci", "sort", "binary", "tree",
-    "graph", "stack", "queue", "linked list", "hash", "ssh", "tcp", "http",
-    "rust", "go", "kotlin", "swift", "ruby", "php", "scala",
+    "import", "module", "npm", "pip", "install", "terminal", "command", "shell",
+    "runtime", "async", "await", "promise", "recursion", "fibonacci", "sort",
+    "binary tree", "linked list", "rust", "go", "kotlin", "swift", "ruby", "php",
 ]
 
 
@@ -604,7 +717,7 @@ with st.sidebar:
         save_history(st.session_state.all_chats)
         st.rerun()
 
-    st.markdown('<div class="section-label">Chats</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-label">Recent</div>', unsafe_allow_html=True)
 
     sorted_chats = sorted(
         st.session_state.all_chats.values(),
@@ -651,11 +764,11 @@ with st.sidebar:
             st.rerun()
 
 
-# ============ HEADER ============
+# ============ TOP BAR ============
 st.markdown(
-    '<div class="page-header">'
-    '<h1>Neuro<span class="x">x</span>a</h1>'
-    '<p class="tagline">Two minds, one smart router.</p>'
+    '<div class="topbar">'
+    '<div class="topbar-brand">Neuro<span class="x">x</span>a</div>'
+    '<div class="topbar-status"><span class="dot"></span><span>Online</span></div>'
     '</div>',
     unsafe_allow_html=True,
 )
@@ -687,17 +800,45 @@ def render_assistant_message(content: str, model: str):
         st.markdown('</div>', unsafe_allow_html=True)
 
 
-# ============ EMPTY STATE ============
+# ============ EMPTY STATE — model cards ============
 if not messages:
     st.markdown(
-        '<div class="empty">'
-        '<div class="title">How can I <em>help</em> you today?</div>'
-        '</div>',
+        f'''
+        <div class="welcome">
+            <div class="welcome-title">Welcome to Neuroxa</div>
+            <div class="welcome-subtitle">Two specialised minds. One smart router. Start typing below.</div>
+
+            <div class="model-grid">
+                <div class="model-card piko">
+                    <div class="model-card-head">
+                        <div class="model-card-avatar"><img src="{PIKO_AVATAR}" alt=""></div>
+                        <div class="model-card-name">Piko</div>
+                        <div class="model-card-tag">Chat</div>
+                    </div>
+                    <p class="model-card-desc">Friendly conversation, everyday questions, casual writing, ideas and brainstorming.</p>
+                </div>
+
+                <div class="model-card mano">
+                    <div class="model-card-head">
+                        <div class="model-card-avatar"><img src="{MANO_AVATAR}" alt=""></div>
+                        <div class="model-card-name">Mano</div>
+                        <div class="model-card-tag">Code</div>
+                    </div>
+                    <p class="model-card-desc">Programming, debugging, technical design, API integrations, code reviews.</p>
+                </div>
+            </div>
+
+            <div class="router-hint">
+                <svg class="router-hint-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>
+                <span>The router picks the right model automatically based on your message.</span>
+            </div>
+        </div>
+        ''',
         unsafe_allow_html=True,
     )
 
 
-# ============ RENDER EXISTING MESSAGES ============
+# ============ RENDER EXISTING ============
 for msg in messages:
     if msg["role"] == "user":
         render_user_message(msg["content"])
@@ -706,7 +847,7 @@ for msg in messages:
 
 
 # ============ INPUT ============
-if prompt := st.chat_input("Type your message..."):
+if prompt := st.chat_input("Message Neuroxa..."):
     if not groq_key:
         st.error("Groq API key missing. Add it to config.py and restart.")
         st.stop()
@@ -730,12 +871,23 @@ if prompt := st.chat_input("Type your message..."):
     with col_content:
         st.markdown('<div class="assistant-content">', unsafe_allow_html=True)
         placeholder = st.empty()
+
+        # Show typing dots while waiting for first token
+        placeholder.markdown(
+            '<div class="typing-dots"><span></span><span></span><span></span></div>',
+            unsafe_allow_html=True,
+        )
+
         try:
             history_for_api = [
                 {"role": m["role"], "content": m["content"]} for m in messages
             ]
             full_response = ""
+            first_token = True
             for token in stream_response(model_name, history_for_api, groq_key):
+                if first_token:
+                    placeholder.empty()
+                    first_token = False
                 full_response += token
                 placeholder.markdown(full_response + "▌")
             placeholder.markdown(full_response)
