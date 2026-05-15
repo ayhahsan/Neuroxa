@@ -15,11 +15,15 @@ import streamlit as st
 from openai import OpenAI
 
 # ============ PAGE CONFIG ============
+# Sidebar state controlled by session — defaults to expanded
+if "sidebar_state" not in st.session_state:
+    st.session_state.sidebar_state = "expanded"
+
 st.set_page_config(
     page_title="Neuroxa",
     page_icon="https://api.iconify.design/lucide:sparkles.svg",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state=st.session_state.sidebar_state
 )
 
 # ============ STORAGE ============
@@ -58,10 +62,11 @@ st.markdown("""
 
 <style>
     :root {
-        --bg: #0E0D0B;
-        --bg-soft: #16140F;
-        --bg-elevated: #1C1A14;
-        --bg-bubble: #1F1C16;
+        --bg: #16140F;          /* Single unified warm brown - sab jagah */
+        --bg-soft: #16140F;     /* Same as bg for consistency */
+        --bg-elevated: #1F1C16; /* Slightly lighter for hover/elevated states */
+        --bg-bubble: #221E18;   /* User message bubble - subtle elevation */
+        --bg-code: #0F0D0A;     /* Darker for code blocks only */
         --ink: #F4F0E6;
         --ink-dim: #A6A095;
         --ink-mute: #6B655A;
@@ -70,50 +75,18 @@ st.markdown("""
         --mano: #DAFF3D;
     }
 
-    /* Force dark background everywhere - kills the brown loading flash */
-    html, body, .stApp, [data-testid="stAppViewContainer"],
-    [data-testid="stMain"], .main {
-        background: #0E0D0B !important;
+    .stApp {
+        background: var(--bg) !important;
         color: var(--ink) !important;
     }
 
-    /* ==== HIDE ALL STREAMLIT CHROME (Fork, GitHub, 3 dots, Hosted with Streamlit, Manage app) ==== */
-    #MainMenu,
-    footer,
-    header[data-testid="stHeader"],
-    [data-testid="stHeader"],
-    [data-testid="stToolbar"],
-    [data-testid="stDecoration"],
-    [data-testid="stStatusWidget"],
-    [data-testid="stSidebarHeader"],
-    [data-testid="stHeaderActionElements"],
-    [data-testid="stMainMenu"],
-    [data-testid="stToolbarActions"],
-    [data-testid="manage-app-button"],
-    [data-testid="stAppDeployButton"],
-    .stDeployButton,
-    .stAppDeployButton,
-    .viewerBadge_container__1QSob,
-    .viewerBadge_link__1S137,
-    .styles_viewerBadge__1yB5_,
-    .stMainMenu,
-    button[kind="header"],
-    button[kind="headerNoPadding"],
-    a[href*="streamlit.io"],
-    a[href*="share.streamlit.io"],
-    a[href*="github.com/streamlit"],
-    iframe[title*="streamlit"] {
+    /* Hide ALL Streamlit chrome */
+    #MainMenu, footer, header[data-testid="stHeader"],
+    [data-testid="stToolbar"], [data-testid="stDecoration"],
+    [data-testid="stStatusWidget"], .stDeployButton, .stAppDeployButton,
+    [data-testid="stSidebarHeader"], [data-testid="collapsedControl"] {
         display: none !important;
         visibility: hidden !important;
-        opacity: 0 !important;
-        height: 0 !important;
-        width: 0 !important;
-        pointer-events: none !important;
-    }
-
-    /* Hide skeleton/loading shimmer that shows brown boxes */
-    .stSkeleton, [data-testid="stSkeleton"] {
-        display: none !important;
     }
 
     .main .block-container {
@@ -186,7 +159,7 @@ st.markdown("""
         border-color: var(--ink-dim) !important;
     }
 
-    /* New chat button - PROMINENT */
+    /* New chat button - PROMINENT, not blank */
     section[data-testid="stSidebar"] .stButton > button[kind="primary"] {
         background: var(--ink) !important;
         color: var(--bg) !important;
@@ -206,7 +179,7 @@ st.markdown("""
         color: var(--bg) !important;
     }
 
-    /* ========== HEADER ========== */
+    /* ========== HEADER (compact) ========== */
     .neuroxa-header-wrap {
         text-align: center;
         padding: 0.5rem 0 1.5rem 0;
@@ -239,7 +212,9 @@ st.markdown("""
         margin-top: 0.25rem !important;
     }
 
-    /* ========== CHAT LAYOUT ========== */
+    /* ========== CHAT LAYOUT - using Streamlit's native columns ========== */
+
+    /* User row - bubble pushed right */
     .user-bubble {
         display: flex;
         justify-content: flex-end;
@@ -254,18 +229,29 @@ st.markdown("""
         border-radius: 16px;
         border-top-right-radius: 4px;
         font-size: 15px;
-        line-height: 1.5;
+        line-height: 1.6;
         color: var(--ink);
         word-wrap: break-word;
+        white-space: pre-wrap;
+    }
+
+    /* Assistant row - avatar + content side by side */
+    .assistant-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin: 1.25rem 0;
     }
 
     .assistant-avatar {
         width: 32px;
         height: 32px;
         border-radius: 50%;
-        overflow: hidden;
-        margin-top: 4px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--line);
         flex-shrink: 0;
+        overflow: hidden;
+        margin-top: 2px;
     }
 
     .assistant-avatar img {
@@ -274,68 +260,90 @@ st.markdown("""
         object-fit: cover;
     }
 
+    /* Assistant content uses Streamlit's natural markdown flow */
     .assistant-content {
+        flex: 1;
         font-size: 15px;
-        line-height: 1.6;
+        line-height: 1.65;
         color: var(--ink);
-        padding-top: 4px;
+        min-width: 0;
     }
 
     .assistant-content p {
-        margin: 0 0 0.75rem 0 !important;
+        margin: 0 0 0.5rem 0 !important;
+    }
+    .assistant-content p:last-child {
+        margin-bottom: 0 !important;
     }
 
-    .assistant-content code {
-        background: var(--bg-elevated) !important;
-        padding: 2px 6px !important;
-        border-radius: 4px !important;
-        font-family: 'Geist Mono', monospace !important;
-        font-size: 13px !important;
-        color: var(--piko) !important;
+    .assistant-content code:not(pre code) {
+        background: var(--bg-elevated);
+        color: var(--mano);
+        padding: 2px 6px;
+        border-radius: 4px;
+        border: 1px solid var(--line);
+        font-family: 'Geist Mono', monospace;
+        font-size: 0.88em;
     }
 
     .assistant-content pre {
-        background: var(--bg-elevated) !important;
+        background: var(--bg-code) !important;
         border: 1px solid var(--line) !important;
         border-radius: 8px !important;
-        padding: 12px !important;
-        overflow-x: auto !important;
+        padding: 1rem !important;
+        margin: 0.75rem 0 !important;
+        overflow-x: auto;
     }
 
     .assistant-content pre code {
-        background: transparent !important;
-        padding: 0 !important;
+        font-family: 'Geist Mono', monospace !important;
+        font-size: 13px !important;
+        line-height: 1.65 !important;
         color: var(--ink) !important;
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
     }
+
+    .assistant-content strong { color: var(--ink); font-weight: 500; }
 
     /* ========== EMPTY STATE ========== */
     .empty-state {
         text-align: center;
-        padding: 3rem 1rem;
+        padding: 4rem 1rem 2rem;
     }
 
     .empty-state-title {
-        font-family: 'Instrument Serif', serif !important;
-        font-size: 2rem !important;
-        color: var(--ink) !important;
-        margin-bottom: 0.5rem !important;
+        font-family: 'Instrument Serif', serif;
+        font-size: 36px;
+        line-height: 1.1;
+        color: var(--ink);
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.02em;
     }
 
     .empty-state-title em {
-        color: var(--ink-dim) !important;
-        font-style: italic !important;
+        font-style: italic;
+        color: var(--ink-dim);
     }
 
     .empty-state-desc {
         color: var(--ink-dim) !important;
-        font-size: 0.95rem !important;
+        font-size: 14px;
+        max-width: 480px;
+        margin: 0 auto;
+        line-height: 1.6;
     }
 
-    /* ========== INPUT ========== */
+    /* ========== CHAT INPUT ========== */
     [data-testid="stChatInput"] {
-        background: var(--bg-elevated) !important;
+        background: var(--bg-soft) !important;
         border: 1px solid var(--line) !important;
-        border-radius: 12px !important;
+        border-radius: 999px !important;
+    }
+
+    [data-testid="stChatInput"]:focus-within {
+        border-color: var(--ink-dim) !important;
     }
 
     [data-testid="stChatInput"] textarea {
@@ -349,69 +357,116 @@ st.markdown("""
         color: var(--ink-mute) !important;
     }
 
-    [data-testid="stBottomBlockContainer"] {
+    /* Bottom bar - force solid brown, no navy tint */
+    [data-testid="stBottom"],
+    [data-testid="stBottomBlockContainer"],
+    [data-testid="stBottom"] > div {
         background: var(--bg) !important;
+        background-color: var(--bg) !important;
+    }
+
+    [data-testid="stChatInput"] button {
+        background: var(--ink) !important;
+        color: var(--bg) !important;
+    }
+
+    [data-testid="stChatInput"] button:hover {
+        background: var(--piko) !important;
+    }
+
+    /* Hide default chat message containers */
+    [data-testid="stChatMessage"] {
+        background: transparent !important;
+        padding: 0 !important;
+        gap: 0 !important;
     }
 
     /* Scrollbar */
-    ::-webkit-scrollbar {
-        width: 8px;
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--ink-mute); }
+
+    /* Hide button styling for sidebar toggle */
+    section[data-testid="stSidebar"] .stButton > button.toggle-btn,
+    .stButton > button[data-toggle-btn="true"] {
+        background: transparent !important;
+        border: 1px solid var(--line) !important;
+        color: var(--ink-mute) !important;
+        font-size: 12px !important;
     }
-    ::-webkit-scrollbar-track {
-        background: var(--bg);
-    }
-    ::-webkit-scrollbar-thumb {
-        background: var(--line);
-        border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-        background: var(--ink-mute);
+
+    hr {
+        border-color: var(--line) !important;
+        margin: 1rem 0 !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
 
-# ============ MODELS ============
+# ============ MODEL CONFIGS ============
 MODELS = {
     "Piko": {
         "model_id": "llama-3.3-70b-versatile",
         "avatar": PIKO_AVATAR,
         "system_prompt": (
-            "You are Piko, a friendly conversational AI from Neuroxa. "
-            "You handle general chat, questions, and casual conversation. "
-            "Be warm, helpful, and concise. Use Hinglish naturally if the user does."
-        ),
+            "You are Piko, one of the two models that power Neuroxa. "
+            "You handle general conversation - friendly, warm, helpful. "
+            "Match the user's language style: if they write in Hinglish (Hindi-English mix), "
+            "reply in Hinglish. If English, reply in English. "
+            "Keep responses conversational and concise. Do not use emojis. "
+            "If you ever need to show ANY code, ALWAYS wrap it in markdown code blocks "
+            "with the language tag like ```python ... ```. Never put code on the same line as prose. "
+            "\n\nIMPORTANT - ABOUT YOUR KNOWLEDGE: Your training data has a cutoff date in late 2023. "
+            "You do NOT know events, ages, or facts that have changed after that date. "
+            "If asked about 'as of 2024', '2025', '2026' or current dates, do NOT do math to guess. "
+            "Instead say: 'Mera knowledge late 2023 tak ka hai. Latest info ke liye verify kar lo.'"
+        )
     },
     "Mano": {
         "model_id": "openai/gpt-oss-120b",
         "avatar": MANO_AVATAR,
         "system_prompt": (
-            "You are Mano, a coding and engineering AI from Neuroxa. "
-            "You handle programming, debugging, technical questions, and software design. "
-            "Be precise, give working code examples, and explain trade-offs."
-        ),
-    },
+            "You are Mano, one of the two models that power Neuroxa. "
+            "You are a senior software engineer specializing in clean, production-ready code. "
+            "Do not use emojis in code or explanations. "
+            "MANDATORY: ALWAYS wrap code in markdown code blocks with the proper language tag "
+            "like ```python ... ```. Use correct language tags (python, javascript, html, css, "
+            "sql, bash, etc.). Structure: brief intro, code block, short explanation. "
+            "Use `inline code` for variable names. Code ALWAYS in fenced block. "
+            "If user writes Hinglish, mix Hinglish in explanations but keep code in English. "
+            "\n\nIMPORTANT: Your training cutoff is mid-2024. For questions about current events "
+            "or info that changes over time, tell user to verify rather than guess."
+        )
+    }
 }
 
 CODE_KEYWORDS = [
-    "code", "function", "class", "bug", "error", "debug", "compile",
-    "python", "javascript", "typescript", "react", "node", "api",
-    "sql", "database", "regex", "html", "css", "java", "c++", "rust",
-    "git", "docker", "linux", "bash", "terminal", "algorithm", "data structure",
-    "syntax", "library", "framework", "endpoint", "deploy",
+    "code", "function", "bug", "error", "exception", "debug", "script", "compile",
+    "python", "javascript", "java", "c++", "cpp", "html", "css", "react", "node",
+    "api", "sql", "database", "query", "algorithm", "syntax", "variable", "loop",
+    "array", "list", "dict", "class", "method", "framework", "library", "package",
+    "git", "github", "deploy", "server", "regex", "json", "xml", "build",
+    "frontend", "backend", "fullstack", "devops", "docker", "kubernetes", "aws",
+    "import", "module", "npm", "pip", "install", "terminal", "command", "shell",
+    "runtime", "memory", "thread", "async", "await", "promise", "factorial",
+    "recursive", "recursion", "fibonacci", "sort", "binary", "tree", "graph"
 ]
 
 
-def route_message(message: str) -> str:
-    msg_lower = message.lower()
+def route_message(msg: str) -> str:
+    msg_lower = msg.lower()
     if any(kw in msg_lower for kw in CODE_KEYWORDS):
         return "Mano"
-    if "```" in message or message.count("`") >= 2:
+    if "```" in msg or msg.count("`") >= 2:
+        return "Mano"
+    code_phrases = ["likh ke de", "likh do", "write a", "create a function", "make a program"]
+    if any(phrase in msg_lower for phrase in code_phrases):
         return "Mano"
     return "Piko"
 
 
-# ============ KEY LOADING ============
+# ============ KEY ============
 def is_placeholder(key: str) -> bool:
     if not key:
         return True
@@ -435,7 +490,7 @@ def load_key():
     return ""
 
 
-# ============ API CLIENT ============
+# ============ API ============
 def get_client(api_key: str) -> OpenAI:
     return OpenAI(api_key=api_key, base_url="https://api.groq.com/openai/v1")
 
@@ -496,10 +551,17 @@ groq_key = load_key()
 
 # ============ SIDEBAR ============
 with st.sidebar:
-    st.markdown(
-        '<div class="sidebar-brand">Neuro<span class="x">x</span>a</div>',
-        unsafe_allow_html=True
-    )
+    # Top row: brand + hide button
+    col_brand, col_hide = st.columns([4, 1])
+    with col_brand:
+        st.markdown(
+            '<div class="sidebar-brand">Neuro<span class="x">x</span>a</div>',
+            unsafe_allow_html=True
+        )
+    with col_hide:
+        if st.button("«", help="Hide sidebar", key="hide_sidebar"):
+            st.session_state.sidebar_state = "collapsed"
+            st.rerun()
 
     if st.button("+ New chat", use_container_width=True, type="primary"):
         chat_id, chat = new_chat()
@@ -516,7 +578,13 @@ with st.sidebar:
         reverse=True
     )
 
-    for chat in sorted_chats:
+    # Only show chats that have at least one message OR are the currently active one
+    visible_chats = [
+        c for c in sorted_chats
+        if c.get("messages") or c["id"] == st.session_state.current_chat_id
+    ]
+
+    for chat in visible_chats:
         is_current = chat["id"] == st.session_state.current_chat_id
         title = chat.get("title", "New chat")
         prefix = "› " if is_current else "  "
@@ -550,6 +618,13 @@ with st.sidebar:
             st.rerun()
 
 
+# ============ MAIN PAGE - SHOW SIDEBAR BUTTON (when collapsed) ============
+if st.session_state.sidebar_state == "collapsed":
+    if st.button("» Show sidebar", key="show_sidebar"):
+        st.session_state.sidebar_state = "expanded"
+        st.rerun()
+
+
 # ============ HEADER ============
 st.markdown(
     '<div class="neuroxa-header-wrap">'
@@ -565,6 +640,7 @@ messages = current_chat["messages"]
 
 # ============ RENDER FUNCTIONS ============
 def render_user_message(content: str):
+    """User message - right aligned bubble, no avatar."""
     safe = content.replace("<", "&lt;").replace(">", "&gt;")
     st.markdown(
         f'<div class="user-bubble"><div class="user-bubble-inner">{safe}</div></div>',
@@ -573,7 +649,9 @@ def render_user_message(content: str):
 
 
 def render_assistant_message(content: str, model: str):
+    """Assistant message - avatar + markdown content, no bubble box."""
     cfg = MODELS[model]
+    # Use columns for proper layout - avatar narrow, content wide
     col_av, col_content = st.columns([1, 20], gap="small")
     with col_av:
         st.markdown(
@@ -581,6 +659,7 @@ def render_assistant_message(content: str, model: str):
             unsafe_allow_html=True
         )
     with col_content:
+        # Wrap markdown in styled container
         with st.container():
             st.markdown(f'<div class="assistant-content">', unsafe_allow_html=True)
             st.markdown(content)
@@ -592,10 +671,6 @@ if not messages:
     st.markdown(
         '<div class="empty-state">'
         '<div class="empty-state-title">How can I <em>help</em> you today?</div>'
-        '<p class="empty-state-desc">'
-        'Coding question hai toh Mano sambhalega, general baat hai toh Piko. '
-        'Auto-routing on hai.'
-        '</p>'
         '</div>',
         unsafe_allow_html=True
     )
@@ -625,6 +700,7 @@ if prompt := st.chat_input("Type your message..."):
     model_name = route_message(prompt)
     cfg = MODELS[model_name]
 
+    # Render avatar via columns, then stream content
     col_av, col_content = st.columns([1, 20], gap="small")
     with col_av:
         st.markdown(

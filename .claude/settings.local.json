@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(git -C \"C:\\\\Users\\\\ayhahsan ansari\\\\neuroxa\" status)",
+      "Bash(git -C \"C:\\\\Users\\\\ayhahsan ansari\\\\neuroxa\" log --oneline -10)",
+      "Bash(git -C \"C:\\\\Users\\\\ayhahsan ansari\\\\neuroxa\" add app.py)",
+      "Bash(git -C 'C:\\\\Users\\\\ayhahsan ansari\\\\neuroxa' commit -m ' *)",
+      "Bash(git *)",
+      "WebFetch(domain:raw.githubusercontent.com)"
+    ]
+  }
+}
