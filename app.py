@@ -802,40 +802,35 @@ def render_assistant_message(content: str, model: str):
 
 # ============ EMPTY STATE — model cards ============
 if not messages:
-    st.markdown(
-        f'''
-        <div class="welcome">
-            <div class="welcome-title">Welcome to Neuroxa</div>
-            <div class="welcome-subtitle">Two specialised minds. One smart router. Start typing below.</div>
-
-            <div class="model-grid">
-                <div class="model-card piko">
-                    <div class="model-card-head">
-                        <div class="model-card-avatar"><img src="{PIKO_AVATAR}" alt=""></div>
-                        <div class="model-card-name">Piko</div>
-                        <div class="model-card-tag">Chat</div>
-                    </div>
-                    <p class="model-card-desc">Friendly conversation, everyday questions, casual writing, ideas and brainstorming.</p>
-                </div>
-
-                <div class="model-card mano">
-                    <div class="model-card-head">
-                        <div class="model-card-avatar"><img src="{MANO_AVATAR}" alt=""></div>
-                        <div class="model-card-name">Mano</div>
-                        <div class="model-card-tag">Code</div>
-                    </div>
-                    <p class="model-card-desc">Programming, debugging, technical design, API integrations, code reviews.</p>
-                </div>
-            </div>
-
-            <div class="router-hint">
-                <svg class="router-hint-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>
-                <span>The router picks the right model automatically based on your message.</span>
-            </div>
-        </div>
-        ''',
-        unsafe_allow_html=True,
+    welcome_html = (
+        '<div class="welcome">'
+        '<div class="welcome-title">Welcome to Neuroxa</div>'
+        '<div class="welcome-subtitle">Two specialised minds. One smart router. Start typing below.</div>'
+        '<div class="model-grid">'
+        '<div class="model-card piko">'
+        '<div class="model-card-head">'
+        f'<div class="model-card-avatar"><img src="{PIKO_AVATAR}" alt=""></div>'
+        '<div class="model-card-name">Piko</div>'
+        '<div class="model-card-tag">Chat</div>'
+        '</div>'
+        '<p class="model-card-desc">Friendly conversation, everyday questions, casual writing, ideas and brainstorming.</p>'
+        '</div>'
+        '<div class="model-card mano">'
+        '<div class="model-card-head">'
+        f'<div class="model-card-avatar"><img src="{MANO_AVATAR}" alt=""></div>'
+        '<div class="model-card-name">Mano</div>'
+        '<div class="model-card-tag">Code</div>'
+        '</div>'
+        '<p class="model-card-desc">Programming, debugging, technical design, API integrations, code reviews.</p>'
+        '</div>'
+        '</div>'
+        '<div class="router-hint">'
+        '<svg class="router-hint-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>'
+        '<span>The router picks the right model automatically based on your message.</span>'
+        '</div>'
+        '</div>'
     )
+    st.markdown(welcome_html, unsafe_allow_html=True)
 
 
 # ============ RENDER EXISTING ============
