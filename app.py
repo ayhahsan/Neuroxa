@@ -16,15 +16,11 @@ from openai import OpenAI
 
 
 # ============ PAGE CONFIG ============
-# Sidebar state tracked in session so our custom menu toggle can control it
-if "sidebar_state" not in st.session_state:
-    st.session_state.sidebar_state = "expanded"
-
 st.set_page_config(
     page_title="Neuroxa",
     page_icon="✦",
     layout="wide",
-    initial_sidebar_state=st.session_state.sidebar_state,
+    initial_sidebar_state="expanded",
 )
 
 
@@ -114,11 +110,10 @@ st.markdown(
         max-width: 860px !important;
     }
 
-    /* ===== Sidebar — minimal CSS so native toggle works ===== */
+    /* ===== Sidebar — minimal styling, let Streamlit control visibility ===== */
     section[data-testid="stSidebar"] {
         background: var(--bg-2) !important;
         border-right: 1px solid var(--border) !important;
-        width: 280px !important;
     }
 
     /* Native sidebar toggle / close button — make visible and styled */
@@ -557,35 +552,8 @@ st.markdown(
     ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
 
     /* ===== Custom MENU TOGGLE button (main page, when sidebar collapsed) ===== */
-    .main .stButton:has(button[kind="secondary"][aria-describedby*="show_sidebar"]),
     div[data-testid="stVerticalBlock"] > div:first-child .stButton {
         margin-bottom: 0.75rem !important;
-    }
-
-    button[data-testid="stBaseButton-secondary"]:has-text("☰") {
-        background: var(--surface) !important;
-    }
-
-    /* Style for the menu show button on main page */
-    .main button:contains("☰") {
-        background: var(--surface) !important;
-        border: 1px solid var(--border) !important;
-        color: var(--text) !important;
-    }
-
-    /* Sidebar HIDE button (the ✕ in the sidebar header column) */
-    section[data-testid="stSidebar"] .stColumn:last-child .stButton > button {
-        padding: 6px 10px !important;
-        min-height: 32px !important;
-        text-align: center !important;
-        color: var(--text-dim) !important;
-        font-size: 14px !important;
-        border-radius: 6px !important;
-    }
-
-    section[data-testid="stSidebar"] .stColumn:last-child .stButton > button:hover {
-        background: var(--surface-2) !important;
-        color: var(--text) !important;
     }
 </style>
 """,
@@ -741,16 +709,10 @@ groq_key = load_key()
 
 # ============ SIDEBAR ============
 with st.sidebar:
-    col_brand, col_hide = st.columns([4, 1])
-    with col_brand:
-        st.markdown(
-            '<div class="brand">Neuro<span class="x">x</span>a</div>',
-            unsafe_allow_html=True,
-        )
-    with col_hide:
-        if st.button("✕", key="hide_sidebar", help="Hide menu"):
-            st.session_state.sidebar_state = "collapsed"
-            st.rerun()
+    st.markdown(
+        '<div class="brand">Neuro<span class="x">x</span>a</div>',
+        unsafe_allow_html=True,
+    )
 
     if st.button("+ New chat", use_container_width=True, type="primary"):
         cid, chat = new_chat()
@@ -804,13 +766,6 @@ with st.sidebar:
                 st.session_state.current_chat_id = cid2
                 save_history(st.session_state.all_chats)
             st.rerun()
-
-
-# ============ SHOW MENU BUTTON (when sidebar collapsed) ============
-if st.session_state.sidebar_state == "collapsed":
-    if st.button("☰ Menu", key="show_sidebar"):
-        st.session_state.sidebar_state = "expanded"
-        st.rerun()
 
 
 # ============ TOP BAR ============
