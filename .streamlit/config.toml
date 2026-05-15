@@ -5,3 +5,10 @@ secondaryBackgroundColor = "#16140F"
 textColor = "#F4F0E6"
 primaryColor = "#FF8B6F"
 font = "sans serif"
+
+[client]
+toolbarMode = "minimal"
+showErrorDetails = false
+
+[browser]
+gatherUsageStats = false

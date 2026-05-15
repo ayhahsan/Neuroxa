@@ -19,7 +19,7 @@ st.set_page_config(
     page_title="Neuroxa",
     page_icon="https://api.iconify.design/lucide:sparkles.svg",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
 # ============ STORAGE ============
@@ -70,22 +70,50 @@ st.markdown("""
         --mano: #DAFF3D;
     }
 
-    .stApp {
-        background: var(--bg) !important;
+    /* Force dark background everywhere - kills the brown loading flash */
+    html, body, .stApp, [data-testid="stAppViewContainer"],
+    [data-testid="stMain"], .main {
+        background: #0E0D0B !important;
         color: var(--ink) !important;
     }
 
-    /* Hide Streamlit chrome (but keep stHeader so the sidebar expand button is reachable) */
-    #MainMenu, footer,
-    [data-testid="stToolbar"], [data-testid="stDecoration"],
-    [data-testid="stStatusWidget"], .stDeployButton, .stAppDeployButton {
+    /* ==== HIDE ALL STREAMLIT CHROME (Fork, GitHub, 3 dots, Hosted with Streamlit, Manage app) ==== */
+    #MainMenu,
+    footer,
+    header[data-testid="stHeader"],
+    [data-testid="stHeader"],
+    [data-testid="stToolbar"],
+    [data-testid="stDecoration"],
+    [data-testid="stStatusWidget"],
+    [data-testid="stSidebarHeader"],
+    [data-testid="stHeaderActionElements"],
+    [data-testid="stMainMenu"],
+    [data-testid="stToolbarActions"],
+    [data-testid="manage-app-button"],
+    [data-testid="stAppDeployButton"],
+    .stDeployButton,
+    .stAppDeployButton,
+    .viewerBadge_container__1QSob,
+    .viewerBadge_link__1S137,
+    .styles_viewerBadge__1yB5_,
+    .stMainMenu,
+    button[kind="header"],
+    button[kind="headerNoPadding"],
+    a[href*="streamlit.io"],
+    a[href*="share.streamlit.io"],
+    a[href*="github.com/streamlit"],
+    iframe[title*="streamlit"] {
         display: none !important;
         visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        width: 0 !important;
+        pointer-events: none !important;
     }
 
-    /* Keep the top header transparent so only the sidebar toggle button shows */
-    header[data-testid="stHeader"] {
-        background: transparent !important;
+    /* Hide skeleton/loading shimmer that shows brown boxes */
+    .stSkeleton, [data-testid="stSkeleton"] {
+        display: none !important;
     }
 
     .main .block-container {
@@ -158,7 +186,7 @@ st.markdown("""
         border-color: var(--ink-dim) !important;
     }
 
-    /* New chat button - PROMINENT, not blank */
+    /* New chat button - PROMINENT */
     section[data-testid="stSidebar"] .stButton > button[kind="primary"] {
         background: var(--ink) !important;
         color: var(--bg) !important;
@@ -178,7 +206,7 @@ st.markdown("""
         color: var(--bg) !important;
     }
 
-    /* ========== HEADER (compact) ========== */
+    /* ========== HEADER ========== */
     .neuroxa-header-wrap {
         text-align: center;
         padding: 0.5rem 0 1.5rem 0;
@@ -211,9 +239,7 @@ st.markdown("""
         margin-top: 0.25rem !important;
     }
 
-    /* ========== CHAT LAYOUT - using Streamlit's native columns ========== */
-
-    /* User row - bubble pushed right */
+    /* ========== CHAT LAYOUT ========== */
     .user-bubble {
         display: flex;
         justify-content: flex-end;
@@ -228,29 +254,18 @@ st.markdown("""
         border-radius: 16px;
         border-top-right-radius: 4px;
         font-size: 15px;
-        line-height: 1.6;
+        line-height: 1.5;
         color: var(--ink);
         word-wrap: break-word;
-        white-space: pre-wrap;
-    }
-
-    /* Assistant row - avatar + content side by side */
-    .assistant-row {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        margin: 1.25rem 0;
     }
 
     .assistant-avatar {
         width: 32px;
         height: 32px;
         border-radius: 50%;
-        background: var(--bg-elevated);
-        border: 1px solid var(--line);
-        flex-shrink: 0;
         overflow: hidden;
-        margin-top: 2px;
+        margin-top: 4px;
+        flex-shrink: 0;
     }
 
     .assistant-avatar img {
@@ -259,90 +274,68 @@ st.markdown("""
         object-fit: cover;
     }
 
-    /* Assistant content uses Streamlit's natural markdown flow */
     .assistant-content {
-        flex: 1;
         font-size: 15px;
-        line-height: 1.65;
+        line-height: 1.6;
         color: var(--ink);
-        min-width: 0;
+        padding-top: 4px;
     }
 
     .assistant-content p {
-        margin: 0 0 0.5rem 0 !important;
-    }
-    .assistant-content p:last-child {
-        margin-bottom: 0 !important;
+        margin: 0 0 0.75rem 0 !important;
     }
 
-    .assistant-content code:not(pre code) {
-        background: var(--bg-elevated);
-        color: var(--mano);
-        padding: 2px 6px;
-        border-radius: 4px;
-        border: 1px solid var(--line);
-        font-family: 'Geist Mono', monospace;
-        font-size: 0.88em;
+    .assistant-content code {
+        background: var(--bg-elevated) !important;
+        padding: 2px 6px !important;
+        border-radius: 4px !important;
+        font-family: 'Geist Mono', monospace !important;
+        font-size: 13px !important;
+        color: var(--piko) !important;
     }
 
     .assistant-content pre {
-        background: #0A0908 !important;
+        background: var(--bg-elevated) !important;
         border: 1px solid var(--line) !important;
         border-radius: 8px !important;
-        padding: 1rem !important;
-        margin: 0.75rem 0 !important;
-        overflow-x: auto;
+        padding: 12px !important;
+        overflow-x: auto !important;
     }
 
     .assistant-content pre code {
-        font-family: 'Geist Mono', monospace !important;
-        font-size: 13px !important;
-        line-height: 1.65 !important;
-        color: var(--ink) !important;
         background: transparent !important;
-        border: none !important;
         padding: 0 !important;
+        color: var(--ink) !important;
     }
-
-    .assistant-content strong { color: var(--ink); font-weight: 500; }
 
     /* ========== EMPTY STATE ========== */
     .empty-state {
         text-align: center;
-        padding: 4rem 1rem 2rem;
+        padding: 3rem 1rem;
     }
 
     .empty-state-title {
-        font-family: 'Instrument Serif', serif;
-        font-size: 36px;
-        line-height: 1.1;
-        color: var(--ink);
-        margin-bottom: 0.5rem;
-        letter-spacing: -0.02em;
+        font-family: 'Instrument Serif', serif !important;
+        font-size: 2rem !important;
+        color: var(--ink) !important;
+        margin-bottom: 0.5rem !important;
     }
 
     .empty-state-title em {
-        font-style: italic;
-        color: var(--ink-dim);
+        color: var(--ink-dim) !important;
+        font-style: italic !important;
     }
 
     .empty-state-desc {
         color: var(--ink-dim) !important;
-        font-size: 14px;
-        max-width: 480px;
-        margin: 0 auto;
-        line-height: 1.6;
+        font-size: 0.95rem !important;
     }
 
-    /* ========== CHAT INPUT ========== */
+    /* ========== INPUT ========== */
     [data-testid="stChatInput"] {
-        background: var(--bg-soft) !important;
+        background: var(--bg-elevated) !important;
         border: 1px solid var(--line) !important;
-        border-radius: 999px !important;
-    }
-
-    [data-testid="stChatInput"]:focus-within {
-        border-color: var(--ink-dim) !important;
+        border-radius: 12px !important;
     }
 
     [data-testid="stChatInput"] textarea {
@@ -356,103 +349,69 @@ st.markdown("""
         color: var(--ink-mute) !important;
     }
 
-    [data-testid="stBottom"] {
-        background: linear-gradient(to top, var(--bg) 70%, transparent) !important;
-    }
-
-    [data-testid="stChatInput"] button {
-        background: var(--ink) !important;
-        color: var(--bg) !important;
-    }
-
-    [data-testid="stChatInput"] button:hover {
-        background: var(--piko) !important;
-    }
-
-    /* Hide default chat message containers */
-    [data-testid="stChatMessage"] {
-        background: transparent !important;
-        padding: 0 !important;
-        gap: 0 !important;
+    [data-testid="stBottomBlockContainer"] {
+        background: var(--bg) !important;
     }
 
     /* Scrollbar */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--ink-mute); }
-
-    hr {
-        border-color: var(--line) !important;
-        margin: 1rem 0 !important;
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: var(--bg);
+    }
+    ::-webkit-scrollbar-thumb {
+        background: var(--line);
+        border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--ink-mute);
     }
 </style>
 """, unsafe_allow_html=True)
 
 
-# ============ MODEL CONFIGS ============
+# ============ MODELS ============
 MODELS = {
     "Piko": {
         "model_id": "llama-3.3-70b-versatile",
         "avatar": PIKO_AVATAR,
         "system_prompt": (
-            "You are Piko, one of the two models that power Neuroxa. "
-            "You handle general conversation - friendly, warm, helpful. "
-            "Match the user's language style: if they write in Hinglish (Hindi-English mix), "
-            "reply in Hinglish. If English, reply in English. "
-            "Keep responses conversational and concise. Do not use emojis. "
-            "If you ever need to show ANY code, ALWAYS wrap it in markdown code blocks "
-            "with the language tag like ```python ... ```. Never put code on the same line as prose. "
-            "\n\nIMPORTANT - ABOUT YOUR KNOWLEDGE: Your training data has a cutoff date in late 2023. "
-            "You do NOT know events, ages, or facts that have changed after that date. "
-            "If asked about 'as of 2024', '2025', '2026' or current dates, do NOT do math to guess. "
-            "Instead say: 'Mera knowledge late 2023 tak ka hai. Latest info ke liye verify kar lo.'"
-        )
+            "You are Piko, a friendly conversational AI from Neuroxa. "
+            "You handle general chat, questions, and casual conversation. "
+            "Be warm, helpful, and concise. Use Hinglish naturally if the user does."
+        ),
     },
     "Mano": {
         "model_id": "openai/gpt-oss-120b",
         "avatar": MANO_AVATAR,
         "system_prompt": (
-            "You are Mano, one of the two models that power Neuroxa. "
-            "You are a senior software engineer specializing in clean, production-ready code. "
-            "Do not use emojis in code or explanations. "
-            "MANDATORY: ALWAYS wrap code in markdown code blocks with the proper language tag "
-            "like ```python ... ```. Use correct language tags (python, javascript, html, css, "
-            "sql, bash, etc.). Structure: brief intro, code block, short explanation. "
-            "Use `inline code` for variable names. Code ALWAYS in fenced block. "
-            "If user writes Hinglish, mix Hinglish in explanations but keep code in English. "
-            "\n\nIMPORTANT: Your training cutoff is mid-2024. For questions about current events "
-            "or info that changes over time, tell user to verify rather than guess."
-        )
-    }
+            "You are Mano, a coding and engineering AI from Neuroxa. "
+            "You handle programming, debugging, technical questions, and software design. "
+            "Be precise, give working code examples, and explain trade-offs."
+        ),
+    },
 }
 
 CODE_KEYWORDS = [
-    "code", "function", "bug", "error", "exception", "debug", "script", "compile",
-    "python", "javascript", "java", "c++", "cpp", "html", "css", "react", "node",
-    "api", "sql", "database", "query", "algorithm", "syntax", "variable", "loop",
-    "array", "list", "dict", "class", "method", "framework", "library", "package",
-    "git", "github", "deploy", "server", "regex", "json", "xml", "build",
-    "frontend", "backend", "fullstack", "devops", "docker", "kubernetes", "aws",
-    "import", "module", "npm", "pip", "install", "terminal", "command", "shell",
-    "runtime", "memory", "thread", "async", "await", "promise", "factorial",
-    "recursive", "recursion", "fibonacci", "sort", "binary", "tree", "graph"
+    "code", "function", "class", "bug", "error", "debug", "compile",
+    "python", "javascript", "typescript", "react", "node", "api",
+    "sql", "database", "regex", "html", "css", "java", "c++", "rust",
+    "git", "docker", "linux", "bash", "terminal", "algorithm", "data structure",
+    "syntax", "library", "framework", "endpoint", "deploy",
 ]
 
 
-def route_message(msg: str) -> str:
-    msg_lower = msg.lower()
+def route_message(message: str) -> str:
+    msg_lower = message.lower()
     if any(kw in msg_lower for kw in CODE_KEYWORDS):
         return "Mano"
-    if "```" in msg or msg.count("`") >= 2:
-        return "Mano"
-    code_phrases = ["likh ke de", "likh do", "write a", "create a function", "make a program"]
-    if any(phrase in msg_lower for phrase in code_phrases):
+    if "```" in message or message.count("`") >= 2:
         return "Mano"
     return "Piko"
 
 
-# ============ KEY ============
+# ============ KEY LOADING ============
 def is_placeholder(key: str) -> bool:
     if not key:
         return True
@@ -476,7 +435,7 @@ def load_key():
     return ""
 
 
-# ============ API ============
+# ============ API CLIENT ============
 def get_client(api_key: str) -> OpenAI:
     return OpenAI(api_key=api_key, base_url="https://api.groq.com/openai/v1")
 
@@ -606,7 +565,6 @@ messages = current_chat["messages"]
 
 # ============ RENDER FUNCTIONS ============
 def render_user_message(content: str):
-    """User message - right aligned bubble, no avatar."""
     safe = content.replace("<", "&lt;").replace(">", "&gt;")
     st.markdown(
         f'<div class="user-bubble"><div class="user-bubble-inner">{safe}</div></div>',
@@ -615,9 +573,7 @@ def render_user_message(content: str):
 
 
 def render_assistant_message(content: str, model: str):
-    """Assistant message - avatar + markdown content, no bubble box."""
     cfg = MODELS[model]
-    # Use columns for proper layout - avatar narrow, content wide
     col_av, col_content = st.columns([1, 20], gap="small")
     with col_av:
         st.markdown(
@@ -625,7 +581,6 @@ def render_assistant_message(content: str, model: str):
             unsafe_allow_html=True
         )
     with col_content:
-        # Wrap markdown in styled container
         with st.container():
             st.markdown(f'<div class="assistant-content">', unsafe_allow_html=True)
             st.markdown(content)
@@ -670,7 +625,6 @@ if prompt := st.chat_input("Type your message..."):
     model_name = route_message(prompt)
     cfg = MODELS[model_name]
 
-    # Render avatar via columns, then stream content
     col_av, col_content = st.columns([1, 20], gap="small")
     with col_av:
         st.markdown(
