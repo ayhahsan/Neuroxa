@@ -12,6 +12,7 @@ import uuid
 from datetime import datetime
 
 import streamlit as st
+import streamlit.components.v1 as components
 from openai import OpenAI
 
 
@@ -551,6 +552,12 @@ st.markdown(
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
 
+    /* Hide the components.html iframe used for JS injection */
+    iframe[title="streamlit_components.v1.html.html"],
+    iframe[height="0"] {
+        display: none !important;
+    }
+
     /* ===== Sidebar EXPAND button (visible when sidebar is collapsed) ===== */
     [data-testid="collapsedControl"],
     [data-testid="stSidebarCollapsedControl"],
@@ -807,6 +814,100 @@ with st.sidebar:
                 st.session_state.current_chat_id = cid2
                 save_history(st.session_state.all_chats)
             st.rerun()
+
+
+# ============ CUSTOM SIDEBAR TOGGLE (injected via parent-page JS) ============
+# Streamlit's native expand button gets hidden in some versions / states.
+# We inject our own floating button into the parent page that:
+#   1. Is always visible at top-left
+#   2. Toggles sidebar by directly manipulating the sidebar element OR
+#      clicking Streamlit's native toggle if found
+components.html(
+    """
+    <script>
+    (function() {
+        const parentDoc = window.parent.document;
+
+        function setupToggle() {
+            if (parentDoc.getElementById('neuroxa-sidebar-toggle')) return;
+
+            const btn = parentDoc.createElement('button');
+            btn.id = 'neuroxa-sidebar-toggle';
+            btn.innerHTML = '☰';
+            btn.title = 'Toggle sidebar';
+            btn.setAttribute('aria-label', 'Toggle sidebar');
+            btn.style.cssText = `
+                position: fixed;
+                top: 14px;
+                left: 14px;
+                z-index: 999999;
+                background: #1F222B;
+                color: #F2F3F5;
+                border: 1px solid #2A2D38;
+                border-radius: 8px;
+                padding: 6px 12px;
+                font-size: 18px;
+                cursor: pointer;
+                font-family: system-ui, sans-serif;
+                line-height: 1;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                transition: all 0.15s ease;
+            `;
+
+            btn.onmouseover = () => {
+                btn.style.background = '#272A35';
+                btn.style.borderColor = '#3A3E4B';
+            };
+            btn.onmouseout = () => {
+                btn.style.background = '#1F222B';
+                btn.style.borderColor = '#2A2D38';
+            };
+
+            btn.onclick = () => {
+                // Try multiple selectors to find Streamlit's native toggle
+                const candidates = [
+                    '[data-testid="collapsedControl"]',
+                    '[data-testid="stSidebarCollapsedControl"]',
+                    '[data-testid="stSidebarCollapseButton"]',
+                    '[data-testid="stSidebarHeader"] button',
+                    'button[kind="header"]',
+                    'button[kind="headerNoPadding"]',
+                ];
+
+                for (const sel of candidates) {
+                    const el = parentDoc.querySelector(sel);
+                    if (el && el.offsetParent !== null || (el && el.click)) {
+                        el.click();
+                        return;
+                    }
+                }
+
+                // Fallback: directly toggle sidebar element visibility
+                const sidebar = parentDoc.querySelector('section[data-testid="stSidebar"]');
+                if (sidebar) {
+                    const isHidden = sidebar.offsetWidth < 50;
+                    if (isHidden) {
+                        sidebar.style.cssText += 'width: 280px !important; min-width: 280px !important; transform: none !important; display: flex !important; visibility: visible !important;';
+                    } else {
+                        sidebar.style.cssText += 'width: 0 !important; min-width: 0 !important; transform: translateX(-100%) !important;';
+                    }
+                }
+            };
+
+            parentDoc.body.appendChild(btn);
+        }
+
+        // Initial setup
+        setupToggle();
+
+        // Re-run setup whenever DOM changes (Streamlit reruns the script)
+        const observer = new MutationObserver(setupToggle);
+        observer.observe(parentDoc.body, { childList: true, subtree: false });
+    })();
+    </script>
+    """,
+    height=0,
+)
 
 
 # ============ TOP BAR ============
