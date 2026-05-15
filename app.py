@@ -551,6 +551,47 @@ st.markdown(
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
 
+    /* ===== Sidebar EXPAND button (visible when sidebar is collapsed) ===== */
+    [data-testid="collapsedControl"],
+    [data-testid="stSidebarCollapsedControl"],
+    [data-testid="stSidebarCollapseButton"],
+    button[kind="header"],
+    button[kind="headerNoPadding"] {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        background: var(--surface) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 8px !important;
+        color: var(--text) !important;
+        padding: 8px 12px !important;
+        top: 0.75rem !important;
+        left: 0.75rem !important;
+        z-index: 999 !important;
+        cursor: pointer !important;
+        transition: all 0.15s ease !important;
+    }
+
+    [data-testid="collapsedControl"]:hover,
+    [data-testid="stSidebarCollapsedControl"]:hover,
+    [data-testid="stSidebarCollapseButton"]:hover,
+    button[kind="header"]:hover,
+    button[kind="headerNoPadding"]:hover {
+        background: var(--surface-2) !important;
+        border-color: var(--border-strong) !important;
+    }
+
+    [data-testid="collapsedControl"] svg,
+    [data-testid="stSidebarCollapsedControl"] svg,
+    [data-testid="stSidebarCollapseButton"] svg,
+    button[kind="header"] svg,
+    button[kind="headerNoPadding"] svg {
+        color: var(--text) !important;
+        fill: var(--text) !important;
+        width: 18px !important;
+        height: 18px !important;
+    }
+
     /* ===== Custom MENU TOGGLE button (main page, when sidebar collapsed) ===== */
     div[data-testid="stVerticalBlock"] > div:first-child .stButton {
         margin-bottom: 0.75rem !important;
