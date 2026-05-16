@@ -558,6 +558,17 @@ st.markdown(
         display: none !important;
     }
 
+    /* Hide Streamlit's native sidebar collapse buttons — their Material Icons
+       font often fails to load, showing raw text like "keyboard_double_arrow_left".
+       We use our own custom toggle button instead. */
+    section[data-testid="stSidebar"] [data-testid="stSidebarHeader"],
+    section[data-testid="stSidebar"] button[kind="header"],
+    section[data-testid="stSidebar"] button[kind="headerNoPadding"],
+    [data-testid="stSidebarCollapseButton"],
+    [data-testid="collapsedControl"] {
+        display: none !important;
+    }
+
     /* ===== Sidebar EXPAND button (visible when sidebar is collapsed) ===== */
     [data-testid="collapsedControl"],
     [data-testid="stSidebarCollapsedControl"],
@@ -817,8 +828,8 @@ with st.sidebar:
 
 
 # ============ CUSTOM SIDEBAR TOGGLE (injected via parent-page JS) ============
-# Bypass Streamlit's hidden toggle entirely. We directly manipulate the
-# sidebar element's CSS via setProperty(name, value, 'important').
+# Bypass Streamlit's hidden toggle entirely. Direct CSS manipulation on
+# the sidebar element using display:none / display:flex for clean layout.
 components.html(
     """
     <script>
@@ -871,31 +882,23 @@ components.html(
                     return;
                 }
 
-                // Determine current state by measuring actual width
-                const rect = sidebar.getBoundingClientRect();
-                const isCurrentlyHidden = rect.width < 50 || rect.left < -50;
+                // Check current state — display:none or width<50 means hidden
+                const computed = parentDoc.defaultView.getComputedStyle(sidebar);
+                const isCurrentlyHidden = computed.display === 'none' || sidebar.offsetWidth < 50;
 
                 if (isCurrentlyHidden) {
-                    // SHOW sidebar — force via inline !important
-                    sidebar.style.setProperty('transform', 'none', 'important');
+                    // SHOW sidebar — display:flex restores it to layout, main shrinks
+                    sidebar.style.setProperty('display', 'flex', 'important');
                     sidebar.style.setProperty('width', '280px', 'important');
                     sidebar.style.setProperty('min-width', '280px', 'important');
-                    sidebar.style.setProperty('max-width', '280px', 'important');
+                    sidebar.style.setProperty('transform', 'none', 'important');
                     sidebar.style.setProperty('margin-left', '0', 'important');
-                    sidebar.style.setProperty('display', 'flex', 'important');
                     sidebar.style.setProperty('visibility', 'visible', 'important');
                     sidebar.style.setProperty('opacity', '1', 'important');
-                    sidebar.style.setProperty('left', '0', 'important');
-                    sidebar.style.setProperty('position', 'relative', 'important');
                     btn.innerHTML = '✕';
                 } else {
-                    // HIDE sidebar
-                    sidebar.style.setProperty('transform', 'translateX(-100%)', 'important');
-                    sidebar.style.setProperty('width', '0', 'important');
-                    sidebar.style.setProperty('min-width', '0', 'important');
-                    sidebar.style.setProperty('max-width', '0', 'important');
-                    sidebar.style.setProperty('margin-left', '-280px', 'important');
-                    sidebar.style.setProperty('opacity', '0', 'important');
+                    // HIDE sidebar — display:none removes from layout, main fills
+                    sidebar.style.setProperty('display', 'none', 'important');
                     btn.innerHTML = '☰';
                 }
             };
@@ -906,7 +909,7 @@ components.html(
         // Initial setup
         setupToggle();
 
-        // Re-inject button if Streamlit removes it during reruns
+        // Re-inject if Streamlit removes the button during reruns
         const observer = new MutationObserver(() => {
             if (!parentDoc.getElementById('neuroxa-sidebar-toggle')) {
                 setupToggle();
